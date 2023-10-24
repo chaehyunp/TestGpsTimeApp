@@ -28,16 +28,17 @@ class MainActivity : AppCompatActivity() {
     var longitude: Double = 127.041577
 
     // 퍼미션 요청 및 결과 받아오는 객체
-    var permissionLauncher = registerForActivityResult<String, Boolean>(ActivityResultContracts.RequestPermission(),
-        object : ActivityResultCallback<Boolean?> {
-            override fun onActivityResult(result: Boolean?) {
-                result?.let {
-                    Toast.makeText(this@MainActivity, "위치정보제공허용", Toast.LENGTH_SHORT).show()
-                    return
+    var permissionLauncher =
+        registerForActivityResult<String, Boolean>(ActivityResultContracts.RequestPermission(),
+            object : ActivityResultCallback<Boolean?> {
+                override fun onActivityResult(result: Boolean?) {
+                    result?.let {
+                        Toast.makeText(this@MainActivity, "위치정보제공허용", Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    Toast.makeText(this@MainActivity, "위치정보제공거부", Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(this@MainActivity, "위치정보제공거부", Toast.LENGTH_SHORT).show()
-            }
-        })
+            })
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +72,22 @@ class MainActivity : AppCompatActivity() {
             return  //명시적 퍼미션
         }
 
-        if (locationManager!!.isProviderEnabled("fused")) { // 위치정보 permission 필요
-            location = locationManager!!.getLastKnownLocation("fused")
-        } else if (locationManager!!.isProviderEnabled("gps")) {
-            location = locationManager!!.getLastKnownLocation("gps")
-        } else if (locationManager!!.isProviderEnabled("network")) {
-            location = locationManager!!.getLastKnownLocation("network")
+
+        locationManager!!.apply {
+            when {
+                isProviderEnabled("fused") -> location = getLastKnownLocation("fused")
+                isProviderEnabled("gps") -> location = getLastKnownLocation("gps")
+                isProviderEnabled("network") -> location = getLastKnownLocation("network")
+            }
         }
+//
+//        if (locationManager!!.isProviderEnabled("fused")) { // 위치정보 permission 필요
+//            location = locationManager!!.getLastKnownLocation("fused")
+//        } else if (locationManager!!.isProviderEnabled("gps")) {
+//            location = locationManager!!.getLastKnownLocation("gps")
+//        } else if (locationManager!!.isProviderEnabled("network")) {
+//            location = locationManager!!.getLastKnownLocation("network")
+//        }
 
         location?.let {
             latitude = location!!.latitude
@@ -98,8 +108,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getTimeZone(latitude: Double, longitude: Double): TimeZone {
-        return TimeZone.getTimeZone(TimeZone.getAvailableIDs((longitude * 10000).toInt()).firstOrNull { it.contains('/') }
-            ?: TimeZone.getDefault().id)
+        return TimeZone.getTimeZone(
+            TimeZone.getAvailableIDs((longitude * 10000).toInt()).firstOrNull { it.contains('/') }
+                ?: TimeZone.getDefault().id)
     }
 
     private fun getCurrentTime(timeZone: TimeZone): String {
