@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         // 위치 정보 관리자
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        // 위치정보 동적 퍼미션
+        // 위치 정보 명시적 퍼미션
         val checkPermission = checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
         if (checkPermission == PackageManager.PERMISSION_DENIED) permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -62,15 +62,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun findLocation() {
         if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return  //명시적 퍼미션
-        }
+        ) return
+
 
 
         locationManager!!.apply {
